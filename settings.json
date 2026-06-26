@@ -15,7 +15,8 @@
   },
   "enabledPlugins": {
     "ast-index@ast-index-marketplace": true,
-    "ksrc@respawn-tools": true
+    "ksrc@respawn-tools": true,
+    "maven-mcp@krozov-ai-tools": true
   },
   "extraKnownMarketplaces": {
     "ast-index-marketplace": {
@@ -28,6 +29,12 @@
       "source": {
         "source": "github",
         "repo": "respawn-llc/claude-plugin-marketplace"
+      }
+    },
+    "krozov-ai-tools": {
+      "source": {
+        "source": "github",
+        "repo": "kirich1409/krozov-ai-tools"
       }
     }
   },

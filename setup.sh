@@ -29,6 +29,52 @@ register_merge_driver() {
     'python3 $HOME/.claude/hooks/json-3way-merge.py %O %A %B'
 }
 
+# Materialize plugins declared in settings.json onto this machine.
+# settings.json (tracked in git) is the single source of truth: `extraKnownMarketplaces`
+# lists marketplaces by github repo and `enabledPlugins` lists plugin@marketplace — both
+# path-free. The plugins/ cache is NOT tracked (it embeds absolute $HOME paths) and is
+# regenerated here. On a fresh machine Claude Code would otherwise only PROMPT to install
+# these; this makes bootstrap deterministic and non-interactive.
+# Idempotent: skips marketplaces/plugins already present. Needs the `claude` CLI + python3.
+install_plugins() {
+  local settings="$CLAUDE_DIR/settings.json"
+  command -v claude >/dev/null 2>&1   || { echo "Skipping plugins: 'claude' not on PATH."; return; }
+  command -v python3 >/dev/null 2>&1  || { echo "Skipping plugins: python3 needed to read settings.json."; return; }
+  [ -f "$settings" ]                  || { echo "Skipping plugins: no settings.json."; return; }
+
+  local have_markets have_plugins name repo plugin
+  have_markets="$(claude plugin marketplace list 2>/dev/null || true)"
+  while read -r name repo; do
+    [ -z "$name" ] && continue
+    grep -q "$name" <<<"$have_markets" \
+      && echo "  marketplace $name: present" \
+      || { echo "  marketplace $name: adding ($repo)"; claude plugin marketplace add "$repo"; }
+  done < <(python3 - "$settings" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+for name,m in (d.get("extraKnownMarketplaces") or {}).items():
+    s=m.get("source",{})
+    if s.get("source")=="github" and s.get("repo"):
+        print(name, s["repo"])
+PY
+)
+
+  have_plugins="$(claude plugin list 2>/dev/null || true)"
+  while read -r plugin; do
+    [ -z "$plugin" ] && continue
+    name="${plugin%@*}"
+    grep -q "$name" <<<"$have_plugins" \
+      && echo "  plugin $name: present" \
+      || { echo "  plugin $plugin: installing"; claude plugin install "$plugin"; }
+  done < <(python3 - "$settings" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+for p,enabled in (d.get("enabledPlugins") or {}).items():
+    if enabled: print(p)
+PY
+)
+}
+
 echo "=== Claude Code Global Settings Setup ==="
 
 # --- Already set up ---
@@ -40,6 +86,8 @@ if [ -d "$CLAUDE_DIR/.git" ]; then
   fi
   register_merge_driver
   add_csync_alias
+  echo "Ensuring plugins..."
+  install_plugins
   echo "Done."
   exit 0
 fi
@@ -50,6 +98,8 @@ if [ ! -d "$CLAUDE_DIR" ]; then
   git clone "$REPO" "$CLAUDE_DIR"
   register_merge_driver
   add_csync_alias
+  echo "Installing plugins..."
+  install_plugins
   echo "Done. Run 'claude' to start."
   exit 0
 fi
@@ -91,5 +141,7 @@ done
 [ -d "$BACKUP_DIR/plugins/data" ] && cp -r "$BACKUP_DIR/plugins/data" "$CLAUDE_DIR/plugins/"
 
 add_csync_alias
+echo "Ensuring plugins..."
+install_plugins
 echo ""
 echo "Done. Backup at: $BACKUP_DIR"
