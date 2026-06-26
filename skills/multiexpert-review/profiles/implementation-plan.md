@@ -1,6 +1,13 @@
 ---
-profile: implementation-plan
+name: implementation-plan
+description: Profile for implementation plans (docs/plans/<slug>/plan.md) produced by write-plan. Tech-matched panel, no mandatory reviewer; red-team anti-gaming rubric plus project-flow checks (complexity band, L0–L2 pyramid, dependency gate).
 artifact_type: implementation plan
+detect:
+  frontmatter_type: [plan]
+  path_globs:
+    - "docs/plans/**/plan.md"
+  structural_signatures:
+    - "^## Technical Approach"
 verdicts: [PASS, CONDITIONAL, FAIL]
 allow_single_reviewer: true
 reviewer_roster:

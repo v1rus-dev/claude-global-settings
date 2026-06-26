@@ -11,34 +11,37 @@ Canonical list of valid profiles. The engine cross-checks this list against the 
 actually present in this directory (excluding `README.md`); any disagreement is
 `PROFILE_INVENTORY_MISMATCH`.
 
-- `implementation-plan` — implementation plans produced by `write-plan` (`docs/plans/<slug>/plan.md`).
-
-> Roadmap (NOT yet present — a caller passing one of these hints gets `UNKNOWN_PROFILE_HINT` until
-> the file is added): `spec` (write-spec), `test-plan` (generate-test-plan). Add them as separate
-> profiles when those callers are wired up; do not list them above until the file exists.
+- `implementation-plan` — implementation plans from `write-plan` (`docs/plans/<slug>/plan.md`).
+- `spec` — feature specifications from `write-spec` (`docs/specs/<date>-<slug>.md`).
+- `test-plan` — test plans from `generate-test-plan` (`docs/testplans/<slug>-test-plan.md`; review receipt at `swarm-report/<slug>-test-plan.md`).
 
 ## Detection precedence (canonical)
 
 Engine Step 1 resolves the profile in this order; first match wins; record the source. Profile is
 **locked at cycle 1** — re-reviews (cycle ≥2) reuse the locked profile and MUST NOT re-detect.
 
+The match values for steps 2–4 are NOT hardcoded here — each profile declares them in its own
+`detect:` block (`frontmatter_type`, `path_globs`, `structural_signatures`). The engine reads every
+profile's `detect:` and matches in this order:
+
 1. **Caller hint** — args begin with `profile: <name>` on the first line(s) before a `---`
    separator. If `<name>` is not in the Inventory → `UNKNOWN_PROFILE_HINT`, stop. Never fall back
    to a default silently.
-2. **Artifact frontmatter** — a `type:` field maps to a profile: `plan` → `implementation-plan`
-   (`spec` → `spec`, `test-plan` → `test-plan` once those exist).
-3. **Path signature** — `docs/plans/**/plan.md` → `implementation-plan`
-   (`docs/specs/**` → `spec`, `docs/testplans/**` → `test-plan`).
-4. **Content signature** — a `## Technical Approach` heading plus an ordered task list →
-   `implementation-plan`.
+2. **Artifact frontmatter** — the artifact's `type:` matches some profile's `detect.frontmatter_type`.
+3. **Path signature** — the artifact path matches some profile's `detect.path_globs`.
+4. **Content signature** — the artifact body matches some profile's `detect.structural_signatures`.
 5. **Ask the user** — only when 1–4 all fail.
+
+A signature that matches two profiles is an authoring error — keep `detect` blocks mutually exclusive.
 
 ## Profile schema — allowed frontmatter
 
 Everything a profile MAY declare:
 
-- `profile` — the name; MUST equal the filename stem and an Inventory entry.
-- `artifact_type` — human label substituted into the engine's prompt skeleton (`{artifact_type}`).
+- `name` — the profile name; MUST equal the filename stem and an Inventory entry.
+- `description` — one-line summary (panel + what the rubric checks).
+- `detect` — `{ frontmatter_type: [...], path_globs: [...], structural_signatures: [...] }`; the detection data consulted by Step 2–4 above.
+- `artifact_type` — OPTIONAL human label substituted into the engine's prompt skeleton (`{artifact_type}`); defaults to the profile name if omitted.
 - `verdicts` — the verdict alphabet, an ordered subset of `[PASS, CONDITIONAL, WARN, FAIL]`.
 - `allow_single_reviewer` — bool; governs the engine's single-reviewer guard.
 - `reviewer_roster` — `{ primary: [...], optional_if: [{ agent, when }] }`. `when` is a regex matched
@@ -48,8 +51,10 @@ Everything a profile MAY declare:
 - `receipt` — OPTIONAL; `{ path_template, fields_to_update: [...] }`. `<slug>` is substituted.
 - `source_routing` — `{ file, plan_mode, conversation }`, each an action or `N/A`.
 
-Plus exactly one body section: `## Prompt augmentation` (substituted into the review prompt as
-`{PROFILE_PROMPT_AUGMENTATION}`; never replaces the engine skeleton).
+Body: `## Prompt augmentation` is the section injected into the review prompt as
+`{PROFILE_PROMPT_AUGMENTATION}` (it never replaces the engine skeleton). A profile MAY add further
+documentation sections (`## Rubric`, `## Verdict policy`, `## Receipt integration`, `## Rationale`)
+for reference — only `## Prompt augmentation` reaches the reviewers' prompts.
 
 ## Forbidden fields (negative-list)
 
@@ -66,5 +71,5 @@ augmentation`.)
 1. Resolved profile name is in the Inventory AND its file is present
    (else `UNKNOWN_PROFILE_HINT` or `PROFILE_INVENTORY_MISMATCH`).
 2. Frontmatter contains no forbidden field (`FORBIDDEN_PROFILE_FIELD`).
-3. `profile` stem == filename == Inventory entry; short-name reviewer collisions resolved per the
+3. `name` == filename stem == Inventory entry; short-name reviewer collisions resolved per the
    engine's family tie-break (`AMBIGUOUS_REVIEWER` on a genuine clash).

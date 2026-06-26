@@ -47,8 +47,8 @@ updated: YYYY-MM-DD
 - `review_verdict`: `pending` at creation; updated by `multiexpert-review` to
   `PASS | WARN | FAIL`; `skipped` on mount (no review occurs).
 - `review_warnings` / `review_blockers`: arrays of short strings populated by `multiexpert-review`.
-  `review_warnings` is written on WARN verdicts (items d or e of the checklist violated —
-  non-blocking); `review_blockers` is written on FAIL (items a, b, or c violated —
+  `review_warnings` is written on WARN verdicts (items d, e, or g of the checklist violated —
+  non-blocking); `review_blockers` is written on FAIL (items a, b, c, or f violated —
   blocks transition to Implement). Both remain empty arrays on PASS / pending / skipped.
   Frontmatter is the single source of truth for review findings — the receipt body does
   not re-list them, keeping downstream YAML parsers authoritative.
