@@ -45,6 +45,7 @@
 
 
 # === FORCE EXCLUDE ===
+temp/
 .credentials.json
 agent-memory/
 channels/

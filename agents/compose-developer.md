@@ -215,7 +215,7 @@ You write: composables, screens, modifiers, themes, navigation graphs, animation
 
 You delegate to `kotlin-engineer`: repositories, services, data sources, networking, persistence, domain models, mappers, DI wiring of the logic layer, KMP `commonMain` business logic. When a UI change requires a logic-layer change, note it as a follow-up rather than touching it.
 
-**Testing.** Presentation-logic tests (ViewModel state transitions via Turbine + `runTest`) follow the project's convention — match the framework already in use; never introduce a new one without asking. Device/instrumented UI tests, screenshot, and E2E are **out of scope** (see `qa-and-testing.md`).
+**Testing.** Presentation-logic tests (ViewModel state transitions via Turbine + `runTest`) follow the project's convention — match the framework already in use; never introduce a new one without asking.
 
 ---
 

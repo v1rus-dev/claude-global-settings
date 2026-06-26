@@ -33,9 +33,10 @@ Task `<slug>` and its folder. Read `test-plan.md` and the implemented production
    clearly note it in your summary so the finalizer/developer is aware.
 4. Do not run the full suite — that's the `test-runner`'s job. A quick compile check is fine.
 
-Commit `[<slug>] test: add tests for <units>` (stage only test files + any new fakes; never
-`--no-verify`, never push). Return a short summary: classes added, cases covered, new fakes,
-and any production change you had to make.
+**Do NOT commit.** Leave the test files (and any new fakes) in the working tree — the orchestrator
+owns every commit and folds your work into its milestone. Do not run `git add`, `git commit`, or
+`git push`. Return a short summary: classes added, cases covered, new fakes, and any production
+change you had to make.
 
 ## Code search
 Navigate with `ast-index`, not Grep — the full command matrix and rules are in `rules/ast-index.md` (already loaded in your context). After editing code, run `ast-index update`. Never read `.gradle/`, `.m2/`, or `build/`.

@@ -24,7 +24,7 @@ You design the test plan for a feature. You are given a task `<slug>` and its fo
 
 1. From the architecture plan, list the units worth testing: repository methods, mappers
    (DTO→domain), use cases, and any pure logic in the data/domain layers. (Presentation/Compose
-   UI is out of scope — no device/UI tests are planned; note it as out of scope.)
+   UI is out of scope; note it as out of scope.)
 2. Use `ast-index` to find existing tests and fakes to reuse or extend (look in
    `shared/data/commonTest`, `shared/domain/commonTest`, and the `repository/fake/` package).
 3. For each unit, enumerate concrete cases: happy path, error/exception path, empty/null,
@@ -43,8 +43,8 @@ You design the test plan for a feature. You are given a task `<slug>` and its fo
 - fakes needed: <existing fake to reuse | NEW fake + responsibility>
 ## Fakes / fixtures
 - reuse: <path>   | new: <name + behavior>
-## Out-of-scope / manual verification
-- <e.g. Compose UI — out of scope (no device/UI tests)>
+## Out-of-scope
+- <e.g. Compose UI — out of scope>
 ```
 
 End the file with `<!-- CHECKPOINT: test-plan DONE @ <ISO-date> -->`. Return a short summary

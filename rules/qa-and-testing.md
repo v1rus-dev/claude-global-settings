@@ -31,9 +31,9 @@ Levels are strictly sequential — each requires the previous to pass. **L0 is t
 |---|---|---|
 | L0 | Build | the project — or just the necessary part (the relevant app/module, not always the whole repo) — compiles. Without this, going further is pointless. |
 | L1 | Static analysis | lint, type check, code review, dependency audit — always applied |
-| L2 | Unit / integration tests | fast, **no device** — pure logic and cross-component behaviour |
+| L2 | Unit / integration tests | fast — pure logic and cross-component behaviour |
 
-**Device/emulator-dependent testing is out of scope.** Anything that needs a running app on an emulator or physical device — instrumented UI tests, screenshot / visual-regression tests, E2E, manual runtime verification — is **not** part of the flow and is **not** written. The ladder tops out at L2 (no-device unit / integration). If a change genuinely cannot be verified any other way than on the running app, flag it and ask the user — never boot an emulator or device silently.
+The ladder tops out at L2 (unit / integration).
 
 ### Disposable verification tests
 
@@ -55,7 +55,7 @@ Classify each case: **P0** release-critical (crash, data-loss, security, payment
 
 ## 3. Lightweight test plan (pure-logic surface)
 
-When the surface is API/library/CLI (no end-user UI) and no `ux-expert` review is in scope, cover only: input validation (types, ranges, malformed), state transitions (input → observable change), error paths (which exception/error code, when). This is the default shape for almost everything now that device-dependent UI testing is out of scope.
+When the surface is API/library/CLI (no end-user UI) and no `ux-expert` review is in scope, cover only: input validation (types, ranges, malformed), state transitions (input → observable change), error paths (which exception/error code, when). This is the default shape for almost everything.
 
 ## 4. Author fixes broken tests in the same run — non-negotiable
 
@@ -74,10 +74,10 @@ A mandatory planning output — defines "done", the contract the **acceptance ga
 | Task / requirements | explicit AC or clear task | plan notes / AC list (`requirements.md` in a pipeline task) |
 | Spec | too large to hold in head; traceable ACs | a written spec doc (`docs/specs/<slug>-spec.md`) |
 | Test plan | structured executable cases | a test-plan doc (the `test-planner` agent in a pipeline project) |
-| Design mockups | UI/UX visual ACs | Figma in the spec, or screenshots — used as a **manual** review reference (no automated visual tests) |
+| Design mockups | UI/UX visual ACs | Figma in the spec, or screenshots — used as a **manual** review reference |
 | Debug artifact | bug-fix only — repro steps are the contract | `swarm-report/<slug>-debug.md` |
 | Behavioral baseline | migration / "shouldn't affect behavior" | captured before changes (see [[task-types]] § Before-state baseline) |
 
-**Behavioral baseline:** for "shouldn't affect behavior" / "migrate without breaking" the before-state IS the truth. Full definition — what qualifies, what does not, the test-coverage shortcut — lives in [[task-types]] § Before-state baseline (single source). In short: capture before any change (existing passing tests, or non-device API/output snapshots), save to `swarm-report/<slug>-baseline.md`, then the acceptance gate verifies after-state matches 1:1. "should be fine" is not a source of truth.
+**Behavioral baseline:** for "shouldn't affect behavior" / "migrate without breaking" the before-state IS the truth. Full definition — what qualifies, what does not, the test-coverage shortcut — lives in [[task-types]] § Before-state baseline (single source). In short: capture before any change (existing passing tests, or API/output snapshots), save to `swarm-report/<slug>-baseline.md`, then the acceptance gate verifies after-state matches 1:1. "should be fine" is not a source of truth.
 
 **Absent source:** if none exists and creating one isn't feasible, document in the plan: intended behavior (one paragraph), why no formal source, what proxy is used (e.g. task description). The acceptance gate blocks when no source is found; the justification supplies the proxy — it does not bypass the gate.
