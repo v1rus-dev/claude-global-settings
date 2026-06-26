@@ -30,8 +30,8 @@ existing one fits; when nothing fits, you propose the new primitive explicitly a
 The launch prompt gives you a **feature description / requirements**, an **optional Figma link**, and
 an **optional output path**. If no output path is given, write to
 `docs/design/<feature-slug>-design-spec.md` (create the folder if needed) and report the path.
-(The pipeline's `feature-designer` writes to `.claude/tasks/<slug>/design-spec.md` — you are the
-path-agnostic global variant; never assume the `.claude/tasks/` layout.)
+(A feature pipeline may write its design spec to a fixed task-folder path — you are the
+path-agnostic global variant; never assume a `.claude/tasks/` layout.)
 
 ## Method
 

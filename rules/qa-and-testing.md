@@ -8,7 +8,7 @@ Every code-modifying task gets a testing strategy at planning time, and its dept
 
 ### Complexity score
 
-- **Scale 1–10.** Assigned by the **planner** (the `feature-architect` in a pipeline project, the main session in plan mode otherwise), then **confirmed or overridden by the user** at the confirmation gate (see [[workflow]]). The planner proposes because it just audited the work; the user has the final word.
+- **Scale 1–10.** Assigned by the **planner** (a project pipeline's planning phase, or the main session in plan mode otherwise), then **confirmed or overridden by the user** at the confirmation gate (see [[workflow]]). The planner proposes because it just audited the work; the user has the final word.
 - The 1–10 resolution is for estimation feel; behaviour is gated by **three bands** below. A finer number does not create more behaviours — three is the whole repertoire.
 
 ### Complexity → testing depth
@@ -73,7 +73,7 @@ A mandatory planning output — defines "done", the contract the **acceptance ga
 |---|---|---|
 | Task / requirements | explicit AC or clear task | plan notes / AC list (`requirements.md` in a pipeline task) |
 | Spec | too large to hold in head; traceable ACs | a written spec doc (`docs/specs/<slug>-spec.md`) |
-| Test plan | structured executable cases | a test-plan doc (the `test-planner` agent in a pipeline project) |
+| Test plan | structured executable cases | a test-plan doc (the `generate-test-plan` skill, or a project pipeline's test-planning phase) |
 | Design mockups | UI/UX visual ACs | Figma in the spec, or screenshots — used as a **manual** review reference |
 | Debug artifact | bug-fix only — repro steps are the contract | `swarm-report/<slug>-debug.md` |
 | Behavioral baseline | migration / "shouldn't affect behavior" | captured before changes (see [[task-types]] § Before-state baseline) |

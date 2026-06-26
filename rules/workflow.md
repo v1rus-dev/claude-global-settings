@@ -4,7 +4,7 @@ This file defines a **gate discipline** — *what* must be true before a task mo
 
 **Gates are abstract; closure is per-project.** Each gate below states an outcome that must hold. *How* it is closed depends on what the current project actually provides:
 
-- **Project with a feature pipeline** (e.g. `mms_mobile_kmp` — `/feature` / `/feature-jira` → `feature-pipeline` skill → agent chain): the pipeline's own phases close most gates internally (its confirmation gate, finalize + code-review loop, expert-reviews). Run the pipeline and let it drive; this file explains what those phases are *for*.
+- **Project with a feature pipeline:** the pipeline's own phases close most gates internally (its confirmation gate, finalize + code-review loop, expert-reviews) by dispatching the global expert/engineer agents. Run the pipeline and let it drive; this file explains what those phases are *for*.
 - **Project without a pipeline:** close each gate manually with the building blocks that exist — `/finalize`, `/code-review`, `/simplify`, `/security-review` skills; the `research` skill for unknowns; the `code-reviewer` / `security-expert` / `performance-expert` / `architecture-expert` / `ux-expert` / `build-engineer` review agents and `test-runner` (via the Agent tool); `gh` for PRs.
 
 Never assume a named skill/command exists — verify against the session's available skills and the project's `.claude/`. A gate whose ideal tool is absent is still mandatory: close it with whatever the project has, and say which tool you used.
@@ -18,7 +18,7 @@ Never assume a named skill/command exists — verify against the session's avail
 
 Autonomy: concentrate questions in this prep phase; once sources are gathered, proceed without round-tripping. A standard/obvious solution — apply it, don't ask. Skip prep only for the same trivial cases as the gates below.
 
-In a feature-pipeline project this gate is the `requirements` + `architecture` + **confirmation gate** phases (the pipeline pauses for plan approval and complexity scoring before any code). Outside one: do it in plan mode.
+In a project with a feature pipeline this gate is its requirements + architecture + **confirmation gate** phases (the pipeline pauses for plan approval and complexity scoring before any code). Outside one: do it in plan mode.
 
 **Quality gate — `/finalize`.** Required after every implementation where code was written — before declaring the task done. `/finalize` owns *how the code is written*: a full **review → fix → simplify** loop that iterates until no findings above Minor severity remain, or exits with ESCALATE requiring a user decision. A standalone run of `code-reviewer` does **not** close this gate — review alone leaves the fix and simplify steps unperformed; «код уже отревьюен» is not grounds to skip it.
 - *Pipeline project:* the pipeline runs the `/finalize` skill + `code-reviewer` (loops finalize → code-review until PASS, then dispatches expert reviews on escalation).
@@ -29,12 +29,12 @@ In a feature-pipeline project this gate is the `requirements` + `architecture` +
 - *Closure:* **automated verification only** — the `test-runner` agent runs the build + the relevant test tasks; the tests covering the acceptance criteria must pass. For non-UI changes, exercise the changed contract through a test rather than by hand.
 
 **PR promotion gate.** Opening a **draft** PR is routine (no confirmation needed) — do it early. Promoting **draft → ready for review** requires explicit user confirmation: it signals the task is complete and makes it visible to reviewers — a shared-state action.
-- *Closure:* `gh pr create --draft` to open, `gh pr ready` to promote. **Note:** the `feature-pipeline` ends at branch commits + `REPORT.md` and never opens or pushes a PR — PR creation is always a manual step after the pipeline.
+- *Closure:* `gh pr create --draft` to open, `gh pr ready` to promote. **Note:** a feature pipeline typically ends at branch commits + a report and never opens or pushes a PR — PR creation is always a manual step after it.
 
 ## Flows
 
 **Non-trivial features:**
-1. Plan mode → **preparation gate** (above): gather + collect sources of truth (spec, Figma, AC list, before-state baseline for migrations), confirm knowledge sources, assess testability and decompose. Research-first for unknowns. In a pipeline project, `/feature` / `/feature-jira` drives this (requirements → architecture → confirmation gate); the confirmation gate is where you review the plan and complexity before code.
+1. Plan mode → **preparation gate** (above): gather + collect sources of truth (spec, Figma, AC list, before-state baseline for migrations), confirm knowledge sources, assess testability and decompose. Research-first for unknowns. In a project with a feature pipeline, its entry command drives this (requirements → architecture → confirmation gate); the confirmation gate is where you review the plan and complexity before code.
 2. Implement on a `feature/*` branch. Open a draft PR early (`gh pr create --draft`).
 3. **Quality gate** (`/finalize`) → **acceptance gate** (`test-runner`: build + tests against the AC) → promote PR to ready (user confirmation required) → drive to merge.
 

@@ -20,10 +20,10 @@ answers *how* (design + ordered tasks). If a spec exists, the plan **references*
 duplicates its requirements. If no spec exists (smaller change), the plan works directly from the
 task description.
 
-In a **feature-pipeline project** (e.g. `mms_mobile_kmp`), the pipeline's own architecture phase
-(`feature-architect` → `.claude/tasks/<slug>/architecture-plan.md`) already plays this role — use the
-pipeline there. `write-plan` is the planning path **outside** a pipeline, or for standalone planning
-that should be saved, expert-reviewed, and resumed.
+In a project with a **feature pipeline**, the pipeline's own architecture phase (which authors its
+own plan artifact) already plays this role — use the pipeline there. `write-plan` is the planning
+path **outside** a pipeline, or for standalone planning that should be saved, expert-reviewed, and
+resumed.
 
 **Core principles:**
 
