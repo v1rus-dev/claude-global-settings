@@ -1,0 +1,37 @@
+{
+  "model": "opus[1m]",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "ast-index@ast-index-marketplace": true,
+    "ksrc@respawn-tools": true
+  },
+  "extraKnownMarketplaces": {
+    "ast-index-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "defendend/Claude-ast-index-search"
+      }
+    },
+    "respawn-tools": {
+      "source": {
+        "source": "github",
+        "repo": "respawn-llc/claude-plugin-marketplace"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark"
+}
