@@ -39,6 +39,16 @@ The ladder tops out at L2 (unit / integration).
 
 Tests don't have to be permanent. To confirm a migration or a one-off / temporary behavior at implementation time, it is valid to **write a test, run it (confirm it actually passes green), then delete it** — verification without committing the test. Distinct from §4: §4 forbids skipping or deleting tests you *broke* (others' coverage); a disposable test is scaffolding you authored and own. Keep a test permanent when the behavior deserves ongoing coverage; use a disposable one when the check is genuinely one-off.
 
+### Test re-run scope — match the check to the change
+
+Re-running the full suite (a multi-minute build) after **every** edit is waste. Scope the verification to what the change can actually affect:
+
+- **Logic / behaviour / signature change** → run the relevant tests (the affected module's suite). This is the only case that needs a real test run.
+- **No-logic change** — annotation-only (`@Immutable`/`@Stable`), pure rename/move, import cleanup, constant dedup, dead-code removal, comment/doc/string-resource edits, build-script metadata — a **compile check is sufficient**; do NOT re-run the test suite. Per §1 "No behavior change → no new test", such edits can't change test outcomes.
+- **Config / rules / markdown only** → no build or test needed at all.
+
+Corollary for orchestrated pipelines: don't fire a full `test-runner` pass after a trivial cleanup or a one-line gate/annotation swap — a compile (or trusting the implementing agent's own green run) closes it. **Batch fix rounds** so several review findings are fixed, then verified once, rather than test-after-each-finding. Reserve full suite runs for: after the main implementation, after a genuinely large change, and as the final pre-PR gate.
+
 ## 1. Public-API coverage gate
 
 In the **tested bands (complexity ≥7)**, a modified public symbol must be exercised by a test — this is the floor within those bands, independent of discretionary depth choices. "Public" = Kotlin without `@internal`/`private`, Swift `public`/`open`, TS `export`; everything else is internal. Below the test threshold (complexity <7) no tests are written, so this gate does not apply.
