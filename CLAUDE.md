@@ -4,6 +4,7 @@
 
 Rules that are not open for discussion. Violating these is an error, not a judgment call.
 
+- **Never run commands with sudo / root privileges.** The agent session has no TTY to enter a password — a `sudo` attempt fails with `conversation failed`, and repeated failures trip `pam_faillock` and lock the user out of their own account. When a step needs root, do NOT attempt it (not directly, not via `!`): hand the exact command to the user to run in their own terminal, and continue with what does not need root. This holds even if a prior `sudo` seemed to work.
 - **Never bypass git hooks** (`--no-verify`, `--no-gpg-sign`, `-c commit.gpgsign=false`, etc.) without explicit user request. If a hook fails — investigate and fix the root cause.
 - **Never commit or push directly from main/master/develop.**
 - **Force push only via `--force-with-lease` or `--force-if-includes`.** Plain `--force` is denied.
