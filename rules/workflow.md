@@ -28,15 +28,15 @@ In a project with a feature pipeline this gate is its requirements + architectur
 **Acceptance gate — it works as intended.** Runs after the quality gate, before PR promotion. Verifies the implementation against the source of truth (spec, test plan, design, or behavioral baseline). Orthogonal to the quality gate: quality checks *how the code is written*, acceptance checks *what the code does* — neither replaces the other, both mandatory. Same exceptions as the quality gate.
 - *Closure:* **automated verification only** — the `test-runner` agent runs the build + the relevant test tasks; the tests covering the acceptance criteria must pass. For non-UI changes, exercise the changed contract through a test rather than by hand.
 
-**PR promotion gate.** Opening a **draft** PR is routine (no confirmation needed) — do it early. Promoting **draft → ready for review** requires explicit user confirmation: it signals the task is complete and makes it visible to reviewers — a shared-state action.
-- *Closure:* `gh pr create --draft` to open, `gh pr ready` to promote. **Note:** a feature pipeline typically ends at branch commits + a report and never opens or pushes a PR — PR creation is always a manual step after it.
+**PR promotion gate.** **Never open a PR (draft or ready) on your own initiative** — opening one is always an explicit user request, never an automatic step. When the work is ready, *offer* to open a draft PR and wait for the user's go-ahead. Promoting **draft → ready for review** likewise requires explicit user confirmation: it signals the task is complete and makes it visible to reviewers — a shared-state action.
+- *Closure:* only after the user asks — `gh pr create --draft` to open, `gh pr ready` to promote. **Note:** a feature pipeline typically ends at branch commits + a report and never opens or pushes a PR — PR creation is always a manual step the user initiates after it.
 
 ## Flows
 
 **Non-trivial features:**
 1. Plan mode → **preparation gate** (above): gather + collect sources of truth (spec, Figma, AC list, before-state baseline for migrations), confirm knowledge sources, assess testability and decompose. Research-first for unknowns. In a project with a feature pipeline, its entry command drives this (requirements → architecture → confirmation gate); the confirmation gate is where you review the plan and complexity before code.
-2. Implement on a `feature/*` branch. Open a draft PR early (`gh pr create --draft`).
-3. **Quality gate** (`/finalize`) → **acceptance gate** (`test-runner`: build + tests against the AC) → promote PR to ready (user confirmation required) → drive to merge.
+2. Implement on a `feature/*` branch. Do **not** open a PR automatically — offer to open a draft PR and open it only when the user asks (`gh pr create --draft`).
+3. **Quality gate** (`/finalize`) → **acceptance gate** (`test-runner`: build + tests against the AC) → open the PR when the user asks → promote PR to ready (user confirmation required) → drive to merge.
 
 **Bug fixes:**
 1. Plan mode (debug + fix in the plan). Capture reproduction steps in `swarm-report/<slug>-debug.md` — this is the source of truth for acceptance.
