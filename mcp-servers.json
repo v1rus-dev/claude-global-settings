@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mobile": {
+      "command": "npx",
+      "args": ["-y", "claude-in-mobile"]
+    }
+  }
+}

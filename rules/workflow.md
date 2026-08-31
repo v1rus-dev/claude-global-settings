@@ -2,6 +2,13 @@
 
 This file defines a **gate discipline** — *what* must be true before a task moves forward and *why* — independent of any specific tool. It is not a forced pipeline: pick what the task needs and let plan mode drive sequencing.
 
+**Gates are closed autonomously.** A gate is a *quality bar the agent must clear*, not a checkpoint
+where it reports to the user. Only the PR promotion gate involves the user by definition; the
+preparation, quality, and acceptance gates are opened, worked, and closed by the agent on its own,
+per [[autonomy]]. Where a gate below reads "ask the user", it means: only after the [[autonomy]]
+ladder is exhausted and the Escalation bar is actually met — otherwise take the best default and
+log an assumption.
+
 **Gates are abstract; closure is per-project.** Each gate below states an outcome that must hold. *How* it is closed depends on what the current project actually provides:
 
 - **Project with a feature pipeline:** the pipeline's own phases close most gates internally (its confirmation gate, finalize + code-review loop, expert-reviews) by dispatching the global expert/engineer agents. Run the pipeline and let it drive; this file explains what those phases are *for*.
@@ -12,13 +19,13 @@ Never assume a named skill/command exists — verify against the session's avail
 ## Mandatory gates
 
 **Preparation gate — before any implementation.** Gather, autonomously and research-first, what's needed to build *and* verify — three outputs, actually collected, not just named:
-- **Sources of truth** (what "done" means): spec/AC, before-state baseline, screenshots/Figma, debug-repro. Actively *produce* them — snapshot the baseline before a migration (existing passing tests, or API/output snapshots). What you can't make yourself and is missing → ask the user, naming what verification degrades without it. Detail: [[qa-and-testing]] §6 + [[task-types]] § Before-state baseline. Starting implementation without the sources of truth needed to verify it is not allowed.
+- **Sources of truth** (what "done" means): spec/AC, before-state baseline, screenshots/Figma, debug-repro. Actively *produce* them — snapshot the baseline before a migration (existing passing tests, or API/output snapshots). What you can't make yourself and is missing → first substitute the best available proxy and record, in the assumption ledger, what verification degrades without it; ask the user when no proxy makes the work verifiable at all, naming what is missing. Detail: [[qa-and-testing]] §6 + [[task-types]] § Before-state baseline. Starting implementation without the sources of truth needed to verify it is not allowed.
 - **Knowledge sources** (how to build it): trusted docs/source per tier T1–T4 — see [[external-sources]]. Agent memory and project code go stale; on a gap or doubt, verify against the official source, don't act from memory. Missing understanding or stuck → research first (the `research` skill — parallel expert investigation of options/feasibility before implementation), not a question to the user.
 - **Testability + decomposition**: assess how hard the change is to verify and propose simplifications up front (sample/sandbox app, extracting logic to a unit boundary) so a prototype is exercised fast; decompose a task too large for one plan. Detail: [[task-types]] § Test feasibility gate.
 
-Autonomy: concentrate questions in this prep phase; once sources are gathered, proceed without round-tripping. A standard/obvious solution — apply it, don't ask. Skip prep only for the same trivial cases as the gates below.
+Autonomy: the target is **zero** questions in this phase and the ceiling is two, batched into a single round (see [[autonomy]] question budget); once sources are gathered, proceed without round-tripping. A standard/obvious solution — apply it, don't ask. Skip prep only for the same trivial cases as the gates below.
 
-In a project with a feature pipeline this gate is its requirements + architecture + **confirmation gate** phases (the pipeline pauses for plan approval and complexity scoring before any code). Outside one: do it in plan mode.
+In a project with a feature pipeline this gate is its requirements + architecture + **confirmation gate** phases — the pipeline **self-approves** the plan and its complexity score and pauses only when the plan trips a risk trigger (see [[autonomy]] § Confirmation gates in pipelines). Outside one: do it in plan mode.
 
 **Quality gate — `/finalize`.** Required after every implementation where code was written — before declaring the task done. `/finalize` owns *how the code is written*: a full **review → fix → simplify** loop that iterates until no findings above Minor severity remain, or exits with ESCALATE requiring a user decision. A standalone run of `code-reviewer` does **not** close this gate — review alone leaves the fix and simplify steps unperformed; «код уже отревьюен» is not grounds to skip it.
 - *Pipeline project:* the pipeline runs the `/finalize` skill + `code-reviewer` (loops finalize → code-review until PASS, then dispatches expert reviews on escalation).

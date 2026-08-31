@@ -75,6 +75,36 @@ PY
 )
 }
 
+# Materialize user-scope MCP servers declared in mcp-servers.json.
+# User-scope servers live in ~/.claude.json, which is outside this repo and is
+# never synced — so every machine must register them itself. Idempotent.
+install_mcp_servers() {
+  local manifest="$CLAUDE_DIR/mcp-servers.json"
+  command -v claude >/dev/null 2>&1   || { echo "Skipping MCP: 'claude' not on PATH."; return; }
+  command -v python3 >/dev/null 2>&1  || { echo "Skipping MCP: python3 needed to read mcp-servers.json."; return; }
+  [ -f "$manifest" ]                  || { echo "Skipping MCP: no mcp-servers.json."; return; }
+
+  local name cmd
+  while IFS=$'\t' read -r name cmd; do
+    [ -z "$name" ] && continue
+    if claude mcp get "$name" >/dev/null 2>&1; then
+      echo "  mcp $name: present"
+    else
+      echo "  mcp $name: adding"
+      # cmd is word-split on purpose: it is a command plus its args.
+      # shellcheck disable=SC2086
+      claude mcp add --scope user --transport stdio "$name" -- $cmd \
+        || echo "  mcp $name: FAILED (continuing)"
+    fi
+  done < <(python3 - "$manifest" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+for name, s in (d.get("mcpServers") or {}).items():
+    print(name, " ".join([s["command"]] + s.get("args", [])), sep="\t")
+PYEOF
+)
+}
+
 echo "=== Claude Code Global Settings Setup ==="
 
 # --- Already set up ---
@@ -88,6 +118,8 @@ if [ -d "$CLAUDE_DIR/.git" ]; then
   add_csync_alias
   echo "Ensuring plugins..."
   install_plugins
+  echo "Ensuring MCP servers..."
+  install_mcp_servers
   echo "Done."
   exit 0
 fi
@@ -100,6 +132,8 @@ if [ ! -d "$CLAUDE_DIR" ]; then
   add_csync_alias
   echo "Installing plugins..."
   install_plugins
+  echo "Ensuring MCP servers..."
+  install_mcp_servers
   echo "Done. Run 'claude' to start."
   exit 0
 fi
@@ -143,5 +177,7 @@ done
 add_csync_alias
 echo "Ensuring plugins..."
 install_plugins
+echo "Ensuring MCP servers..."
+install_mcp_servers
 echo ""
 echo "Done. Backup at: $BACKUP_DIR"
