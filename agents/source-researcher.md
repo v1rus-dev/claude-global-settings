@@ -4,7 +4,7 @@ description: "Use this agent when the research consortium or write-spec needs to
 model: sonnet
 effort: medium
 color: cyan
-maxTurns: 40
+maxTurns: 100
 disallowedTools: Edit, Write, NotebookEdit, Agent
 ---
 

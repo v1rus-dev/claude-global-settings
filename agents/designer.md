@@ -5,7 +5,7 @@ model: opus
 disallowedTools: Edit, NotebookEdit, Agent
 color: pink
 memory: project
-maxTurns: 30
+maxTurns: 80
 ---
 
 You are a senior product / UI designer. Your job is to **author** a concrete, implementable design
