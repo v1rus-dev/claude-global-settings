@@ -1,4 +1,5 @@
 {
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -200,6 +201,12 @@
         "url": "https://gitlab.modsen.app/yegor.cheprasov/modsenclaude.git"
       },
       "autoUpdate": true
+    },
+    "v1rus-dev": {
+      "source": {
+        "source": "github",
+        "repo": "v1rus-dev/v1rus-claude-plugins"
+      }
     }
   },
   "tui": "fullscreen",
@@ -233,6 +240,5 @@
       "**Org-specific CLIs**: None configured",
       "routine under runs/**, profile/**, input/**, output/** — process/data working files for this project's CV pipeline"
     ]
-  },
-  "model": "sonnet"
+  }
 }
